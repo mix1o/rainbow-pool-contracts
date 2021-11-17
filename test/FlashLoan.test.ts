@@ -7,24 +7,19 @@ import {
   MyToken__factory,
   Borrower,
   Borrower__factory,
-  Reentrance,
   Reentrance__factory,
-  Thief,
   Thief__factory,
 } from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 describe("Flash Loan Contract", () => {
   let flashLoan: FlashLoan;
-  // let flashLoanBorrower: FlashLoan;
 
   let myToken: MyToken;
 
   let diablo: SignerWithAddress, alwin: SignerWithAddress;
 
   let borrower: Borrower;
-  let reentrance: Reentrance;
-  let thief: Thief;
 
   beforeEach(async () => {
     [diablo, alwin] = await ethers.getSigners();
@@ -57,7 +52,7 @@ describe("Flash Loan Contract", () => {
       );
     });
 
-    it("borrower returns too less tokens - revert", async () => {
+    it("borrower returns not enough less tokens - revert", async () => {
       borrower = await new Borrower__factory(alwin).deploy();
       await myToken.mint(diablo.address, 100000);
       await myToken.approve(flashLoan.address, 100000);
@@ -82,7 +77,7 @@ describe("Flash Loan Contract", () => {
       );
     });
     it("reentrance flash loan - revert", async () => {
-      reentrance = await new Reentrance__factory(alwin).deploy(
+      const reentrance = await new Reentrance__factory(alwin).deploy(
         flashLoan.address
       );
 
@@ -100,7 +95,7 @@ describe("Flash Loan Contract", () => {
     });
 
     it("thief borrower doesn't return tokens - revert", async () => {
-      thief = await new Thief__factory(alwin).deploy();
+      const thief = await new Thief__factory(alwin).deploy();
 
       await myToken.mint(diablo.address, 100000);
       await myToken.approve(flashLoan.address, 100000);

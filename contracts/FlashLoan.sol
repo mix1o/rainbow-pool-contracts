@@ -17,6 +17,15 @@ contract FlashLoan is Ownable, IFlashLoan, ReentrancyGuard {
     address _tokenAddress,
     uint256 _amount
   ) public override nonReentrant {
+    require(
+      IERC20(_tokenAddress).balanceOf(owner()) >= _amount,
+      "Amount exceeds balance"
+    );
+    require(
+      IERC20(_tokenAddress).allowance(owner(), address(this)) >= _amount,
+      "Allowance is not set"
+    );
+
     IERC20(_tokenAddress).transferFrom(owner(), msg.sender, _amount);
 
     uint256 beforeTokens = IERC20(_tokenAddress).balanceOf(owner());

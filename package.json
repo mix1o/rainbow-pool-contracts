@@ -34,5 +34,8 @@
     "ts-node": "^10.4.0",
     "typechain": "^6.0.2",
     "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "@ethersproject/units": "^5.5.0"
   }
 }

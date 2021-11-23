@@ -1,9 +1,10 @@
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Pool.sol";
 
-contract LpToken is ERC20PresetMinterPauser {
+contract LpToken is ERC20PresetMinterPauser, Ownable {
   address public poolAddress;
   address public tokenAddress;
 
@@ -17,8 +18,21 @@ contract LpToken is ERC20PresetMinterPauser {
     tokenAddress = _tokenAddress;
   }
 
-  function grantPoolRole() public {
+  function grantPoolRole() public onlyOwner {
     grantRole(MINTER_ROLE, poolAddress);
+  }
+
+  function collectRewards() public {
+    _collectRewards(msg.sender);
+  }
+
+  function _collectRewards(address _userAddress) private {
+    uint256 amount = ((Pool(poolAddress).stake() -
+      Pool(poolAddress).userStake(_userAddress)) *
+      this.balanceOf(_userAddress)) / 10**Pool(poolAddress).decimals();
+
+    IERC20(tokenAddress).transferFrom(poolAddress, _userAddress, amount);
+    Pool(poolAddress).changeUserStake(_userAddress);
   }
 
   function _beforeTokenTransfer(
@@ -34,18 +48,5 @@ contract LpToken is ERC20PresetMinterPauser {
     if (from != address(0)) {
       _collectRewards(from);
     }
-  }
-
-  function _collectRewards(address _userAddress) private {
-    uint256 amount = ((Pool(poolAddress).stake() -
-      Pool(poolAddress).userStake(_userAddress)) *
-      this.balanceOf(_userAddress)) / 10**Pool(poolAddress).decimals();
-
-    IERC20(tokenAddress).transferFrom(poolAddress, _userAddress, amount);
-    Pool(poolAddress).changeUserStake(_userAddress);
-  }
-
-  function collectRewards() public {
-    _collectRewards(msg.sender);
   }
 }

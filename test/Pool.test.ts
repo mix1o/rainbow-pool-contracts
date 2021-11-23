@@ -59,10 +59,10 @@ describe("Pool Contract", () => {
 
     await pool.setLpToken(lpToken.address);
     await pool.setToken(myToken.address);
+    await pool.setFlashLoan(flashLoan.address);
     await pool.setInitialAllowance(flashLoan.address);
-
+    await pool.grantRoleController();
     await pool.connect(diablo).deposit(parseUnits("30"));
-
     expect((await myToken.balanceOf(diablo.address)).toString()).to.be.equal(
       "0"
     );

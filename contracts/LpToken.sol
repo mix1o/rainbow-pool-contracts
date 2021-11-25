@@ -6,10 +6,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract LpToken is ERC20PresetMinterPauser, Ownable {
     address public poolAddress;
     address public tokenAddress;
-    uint256 public stake = 0;
-    uint256 public lastBalance = 0;
+    uint256 private stake = 0;
+    uint256 private lastBalance = 0;
 
-    mapping(address => uint256) public userStake;
+    mapping(address => uint256) private userStake;
 
     constructor(
         string memory _name,
@@ -25,7 +25,11 @@ contract LpToken is ERC20PresetMinterPauser, Ownable {
         grantRole(MINTER_ROLE, poolAddress);
     }
 
-    function countReward() public returns (uint256) {
+    function collectRewards() public {
+        _collectRewards(msg.sender);
+    }
+
+    function _countReward() private returns (uint256) {
         uint256 currentBalance = IERC20(tokenAddress).balanceOf(address(this));
         if (lastBalance != currentBalance) {
             uint256 reward = currentBalance - lastBalance;
@@ -35,20 +39,16 @@ contract LpToken is ERC20PresetMinterPauser, Ownable {
         return 0;
     }
 
-    function collectRewards() public {
-        _collectRewards(msg.sender);
-    }
-
-    function distributeReward(uint256 _reward) public {
+    function _distributeReward(uint256 _reward) private {
         stake = stake + (_reward * 10**decimals()) / totalSupply();
     }
 
     function _collectRewards(address _userAddress) private {
-        uint256 reward = countReward();
+        _distributeReward(_countReward());
 
-        distributeReward(reward);
         uint256 amount = ((stake - userStake[_userAddress]) *
             balanceOf(_userAddress)) / 10**decimals();
+
         userStake[_userAddress] = stake;
 
         IERC20(tokenAddress).transfer(_userAddress, amount);

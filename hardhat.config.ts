@@ -4,8 +4,12 @@
 import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
+import "@nomiclabs/hardhat-ethers";
 import { HardhatUserConfig } from "hardhat/types";
+import "hardhat-deploy";
+import dotenv from "dotenv";
 
+dotenv.config();
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
@@ -15,8 +19,20 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 });
 
 const config: HardhatUserConfig = {
+  namedAccounts: {
+    deployer: {
+      default: 0,
+    },
+  },
+  networks: {
+    rinkeby: {
+      saveDeployments: true,
+      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_KEY}`,
+      accounts: [`${process.env.PRIVATE_KEY}`],
+    },
+  },
   solidity: {
-    version: "0.8.1",
+    version: "0.8.6",
     settings: {
       optimizer: {
         enabled: true,
@@ -29,6 +45,9 @@ const config: HardhatUserConfig = {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
 };
 

@@ -55,14 +55,15 @@ describe("Pool Contract", () => {
     await myToken.connect(diablo).approve(pool.address, parseUnits("30"));
     await myToken.connect(alwin).approve(borrower.address, parseUnits("20"));
 
+    await pool.setConfigurationPool(
+      lpToken.address,
+      flashLoan.address,
+      myToken.address
+    );
     await lpToken.grantPoolRole();
 
-    await pool.setLpToken(lpToken.address);
-    await pool.setToken(myToken.address);
-    await pool.setFlashLoan(flashLoan.address);
-    await pool.setInitialAllowance(flashLoan.address);
-    await pool.grantRoleController();
     await pool.connect(diablo).deposit(parseUnits("30"));
+
     expect((await myToken.balanceOf(diablo.address)).toString()).to.be.equal(
       "0"
     );
@@ -74,13 +75,10 @@ describe("Pool Contract", () => {
 
   it("user calls function collectRewards twice - should get only one reward", async () => {
     await lpToken.connect(diablo).collectRewards();
-
     expect((await myToken.balanceOf(diablo.address)).toString()).to.be.equal(
       "99999999999999990"
     );
-
     await lpToken.connect(diablo).collectRewards();
-
     expect((await myToken.balanceOf(diablo.address)).toString()).to.be.equal(
       "99999999999999990"
     );
@@ -88,23 +86,17 @@ describe("Pool Contract", () => {
 
   it("user is not able to cheat pool contract", async () => {
     await lpToken.connect(diablo).collectRewards();
-
     expect((await myToken.balanceOf(diablo.address)).toString()).to.be.equal(
       "99999999999999990"
     );
-
     await lpToken.connect(diablo).transfer(cheater.address, parseUnits("2"));
-
     expect((await lpToken.balanceOf(cheater.address)).toString()).to.be.equal(
       parseUnits("2")
     );
-
     expect((await myToken.balanceOf(cheater.address)).toString()).to.be.equal(
       "0"
     );
-
     await lpToken.connect(cheater).collectRewards();
-
     expect((await myToken.balanceOf(cheater.address)).toString()).to.be.equal(
       "0"
     );
@@ -123,7 +115,6 @@ describe("Pool Contract", () => {
     expect((await lpToken.balanceOf(diablo.address)).toString()).to.be.equal(
       parseUnits("0")
     );
-
     expect((await myToken.balanceOf(diablo.address)).toString()).to.be.equal(
       "30099999999999999990"
     );

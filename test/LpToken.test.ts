@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
-import { parseUnits } from "@ethersproject/units";
+import { parseUnits, parseEther } from "@ethersproject/units";
 import {
   LpToken,
   LpToken__factory,
@@ -30,19 +30,19 @@ describe("LpToken Contract", () => {
     //1. Alwin buys LP
     await lpToken.mint(alwin.address, parseUnits("50"));
     expect((await lpToken.balanceOf(alwin.address)).toString()).to.be.equal(
-      parseUnits("50")
+      parseUnits("50").toString()
     );
 
     //2. Borys buys LP
     await lpToken.mint(borys.address, parseUnits("40"));
     expect((await lpToken.balanceOf(borys.address)).toString()).to.be.equal(
-      parseUnits("40")
+      parseUnits("40").toString()
     );
 
     //3. Pool makes 50 tokens
     await myToken.mint(lpToken.address, parseUnits("50"));
     expect((await myToken.balanceOf(lpToken.address)).toString()).to.be.equal(
-      parseUnits("50")
+      parseUnits("50").toString()
     );
 
     //4. Borys claims
@@ -70,7 +70,7 @@ describe("LpToken Contract", () => {
     //7. Diablo buys 20
     await lpToken.mint(diablo.address, parseUnits("20"));
     expect((await lpToken.balanceOf(diablo.address)).toString()).to.be.equal(
-      parseUnits("20")
+      parseUnits("20").toString()
     );
 
     //8. Diablo claims

@@ -12,8 +12,8 @@ import {
   Pool,
   Pool__factory,
 } from "../typechain-types";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { parseUnits } from "@ethersproject/units";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 
 describe("Pool Contract", () => {
   let flashLoan: FlashLoan;
@@ -91,7 +91,7 @@ describe("Pool Contract", () => {
     );
     await lpToken.connect(diablo).transfer(cheater.address, parseUnits("2"));
     expect((await lpToken.balanceOf(cheater.address)).toString()).to.be.equal(
-      parseUnits("2")
+      parseUnits("2").toString()
     );
     expect((await myToken.balanceOf(cheater.address)).toString()).to.be.equal(
       "0"
@@ -103,7 +103,7 @@ describe("Pool Contract", () => {
   });
   it("function withdraw works correctly", async () => {
     expect((await lpToken.balanceOf(diablo.address)).toString()).to.be.equal(
-      parseUnits("30")
+      parseUnits("30").toString()
     );
     await lpToken
       .connect(diablo)
@@ -113,7 +113,7 @@ describe("Pool Contract", () => {
       );
     await pool.connect(diablo).withdraw();
     expect((await lpToken.balanceOf(diablo.address)).toString()).to.be.equal(
-      parseUnits("0")
+      parseUnits("0").toString()
     );
     expect((await myToken.balanceOf(diablo.address)).toString()).to.be.equal(
       "30099999999999999990"

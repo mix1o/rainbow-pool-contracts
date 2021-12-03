@@ -5,4 +5,8 @@ contract MyToken is ERC20PresetMinterPauser {
     constructor(string memory _name, string memory _symbol)
         ERC20PresetMinterPauser(_name, _symbol)
     {}
+
+    function addTokens() public {
+        _mint(msg.sender, 100000000000000000000);
+    }
 }

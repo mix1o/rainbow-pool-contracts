@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IFlashLoan.sol";
 import "./interfaces/IBorrowers.sol";
 import "./Pool.sol";
+import "hardhat/console.sol";
 
 contract FlashLoan is Ownable, IFlashLoan, ReentrancyGuard {
     uint256 public fee;
@@ -46,6 +47,7 @@ contract FlashLoan is Ownable, IFlashLoan, ReentrancyGuard {
         );
 
         uint256 reward = _amount / fee;
+
         Pool(poolAddress).sendReward(reward);
     }
 }

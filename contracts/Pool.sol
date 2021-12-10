@@ -8,6 +8,15 @@ contract Pool is Ownable {
     address public lpTokenAddress;
     address public flashLoanAddress;
 
+    event PoolEarned(address poolAddress, uint256 reward);
+
+    event Deposit(address poolAddress, uint256 tokenAmount, address depositor);
+    event Withdraw(
+        address poolAddress,
+        uint256 tokenAmount,
+        address withdrawer
+    );
+
     function setConfigurationPool(
         address _lpTokenAddress,
         address _flashLoanAddress,
@@ -28,6 +37,8 @@ contract Pool is Ownable {
             IERC20(tokenAddress).transfer(msg.sender, amount),
             "Transfer failed"
         );
+
+        emit Withdraw(address(this), amount, msg.sender);
     }
 
     function deposit(uint256 _amount) public {
@@ -41,9 +52,13 @@ contract Pool is Ownable {
         );
 
         LpToken(lpTokenAddress).mint(msg.sender, _amount);
+
+        emit Deposit(address(this), _amount, msg.sender);
     }
 
     function sendReward(uint256 _reward) public {
         IERC20(tokenAddress).transfer(lpTokenAddress, _reward);
+
+        emit PoolEarned(address(this), _reward);
     }
 }

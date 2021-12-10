@@ -21,6 +21,7 @@ const deployment: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const configLpTokenTx = await lpTokenInstance.grantPoolRole();
 
   configTx.wait();
+  configLpTokenTx.wait();
 };
 
 deployment.dependencies = ["Pool", "LpToken", "MyToken", "FlashLoan"];
